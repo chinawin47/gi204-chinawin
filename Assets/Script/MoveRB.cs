@@ -4,26 +4,29 @@ using UnityEngine;
 
 public class MoveRB : MonoBehaviour
 {
-    public float speed = 5f; // ความเร็วของการเคลื่อนที่
-
-    private Rigidbody rb;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>(); // เข้าถึง RigidBody ของอ็อบเจกต์
-    }
+    public Rigidbody rb;
+    public float enginePowerThrust, liftBooster, drag, angularDrag;
 
     void FixedUpdate()
     {
-        // ดึงอินพุตจากผู้ใช้
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
 
-        // สร้างเวกเตอร์ที่บอกทิศทางการเคลื่อนที่
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        if (Input.GetKey( KeyCode.Space ))
+        {
 
-        // ใช้ RigidBody เพื่อเคลื่อนที่อ็อบเจกต์
-        rb.AddForce(movement * speed);
+            rb.AddForce( transform.forward * enginePowerThrust );
+
+        }
+
+        Vector3 lift = Vector3.Project(rb.velocity, transform.forward);
+        rb.AddForce ( transform.up * lift.magnitude * liftBooster );
+
+        rb.drag = rb.velocity.magnitude * drag;
+        rb.angularDrag = rb.velocity.magnitude * angularDrag;
+
+        rb.AddTorque( Input.GetAxis("Horizontal") * transform.forward * -1 );
+
+        rb.AddTorque(Input.GetAxis("Vertical") * transform.right );
+
     }
 
 }
